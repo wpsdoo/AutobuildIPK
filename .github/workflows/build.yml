@@ -12,19 +12,19 @@ on:
 jobs: 
   build: 
     runs-on: ubuntu-latest 
-    
     steps:
     - name: Checkout
-      uses: actions/checkout@main
-
+    uses: actions/checkout@main
+    
     - name: Set up OpenWRT SDK
     run: |
       git clone https://git.openwrt.org/openwrt/openwrt.git
       cd openwrt
       ./scripts/feeds update -a
       ./scripts/feeds install -a
-      
+
     - name: Compile the IPK
     run: |
       cd openwrt
       make package/[your-package]/compile V=s
+
