@@ -1,0 +1,25 @@
+name: Build OpenWRT IPK
+
+on:
+  push:
+    branches:
+    - master
+
+jobs: 
+  build: 
+  runs-on: ubuntu-latest 
+    steps: 
+    – name: Checkout code 
+      uses: actions/checkout@v2
+
+- name: Set up OpenWRT SDK
+    run: |
+      git clone https://git.openwrt.org/openwrt/openwrt.git
+      cd openwrt
+      ./scripts/feeds update -a
+      ./scripts/feeds install -a
+ 
+  - name: Compile IPK
+    run: |
+      cd openwrt
+      make package/[your-package]/compile V=s
