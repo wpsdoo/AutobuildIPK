@@ -31,6 +31,9 @@ msgstr "周六"
 msgid "Sunday"
 msgstr "周日"
 
+msgid "Everyday"
+msgstr "每天"
+
 msgid "Not running"
 msgstr "未运行"
 
