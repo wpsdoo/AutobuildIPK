@@ -7,24 +7,39 @@ on:
       ssh:
         description: 'SSH connection to Actions'
         required: false
-        default: 'true'
+        default: 'false'
 
-jobs: 
-  build: 
-    runs-on: ubuntu-latest 
+jobs:
+  build:
+    name: Build ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
     steps:
-    - name: Checkout
-    uses: actions/checkout@main
-    
-    - name: Set up OpenWRT SDK
-    run: |
-      git clone https://git.openwrt.org/openwrt/openwrt.git
-      cd openwrt
-      ./scripts/feeds update -a
-      ./scripts/feeds install -a
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+      - name: Building packages
+        uses: sbwml/openwrt-gh-action-sdk@go1.24
+        env:
+          ARCH: ${{ matrix.arch }}-openwrt-24.10
+          FEEDNAME: packages_ci
+          PACKAGES: luci-app-nft-timecontrol
+          NO_REFRESH_CHECK: true
 
-    - name: Compile the IPK
-    run: |
-      cd openwrt
-      make package/[your-package]/compile V=s
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}
+          path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
 
+      - name: Upload packages
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: "bin/packages/${{ matrix.arch }}/packages_ci/*.ipk"
